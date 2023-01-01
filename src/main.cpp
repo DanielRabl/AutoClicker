@@ -13,8 +13,8 @@ int main() try {
 	qpl::println("double press LCTR  to change speed.");
 
 	qpl::cubic_generator random_range;
-	random_range.set_random_range(tick * 0.5, tick * 1.5);
-	random_range.set_speed(0.5);
+	random_range.set_random_range(-1.0, 1.0);
+	random_range.set_speed(1.5);
 
 	qpl::f64 random_tick = tick * qpl::random(0.5, 1.5);
 	qpl::small_clock clock;
@@ -31,19 +31,12 @@ int main() try {
 
 		if (qpl::winsys::key_pressed(VK_XBUTTON1)) {
 			autoclicker = !autoclicker;
-			if (autoclicker) {
-				qpl::println("autoclicker ON");
-			}
-			else {
-				qpl::println("autoclicker OFF");
-			}
 		}
-		if (qpl::winsys::key_pressed(VK_XBUTTON2)) {
+		if (autoclicker && qpl::winsys::key_pressed(VK_XBUTTON2)) {
 			boost = !boost;
 		}
 		if (lcontrol_once_pressed && lcontrol_pressed && lcontrol_clock.elapsed_f() < 0.5) {
 			tick = get_tickspeed();
-			random_range.set_random_range(tick * 0.5, tick * 1.5);
 		}
 		if (lcontrol_pressed) {
 			lcontrol_clock.reset();
@@ -52,7 +45,8 @@ int main() try {
 
 		if (autoclicker) {
 			random_range.update(frame_time.elapsed_f());
-			auto delta = random_range.get();
+			auto exp = std::pow(2, random_range.get());
+			auto delta = tick * exp;
 
 			if (boost) delta /= 4;
 			if (clock.has_elapsed_reset(delta)) {
