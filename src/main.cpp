@@ -6,7 +6,7 @@ qpl::f64 get_tickspeed() {
 }
 
 int main() try {
-	qpl::f64 tick = 1.0 / 30.0;
+	qpl::f64 tick = 1.0 / 10.0;
 
 	qpl::println("press VK_XBUTTON1 to toggle autoclick.");
 	qpl::println("press VK_XBUTTON2 to boost.");
