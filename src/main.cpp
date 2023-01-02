@@ -11,7 +11,6 @@ int main() try {
 	qpl::println("press VK_XBUTTON1 to toggle autoclick.");
 	qpl::println("press VK_XBUTTON2 to boost.");
 	qpl::println("double press LCTR  to change speed.");
-	qpl::winsys::hide_console();
 
 	qpl::cubic_generator random_range;
 	random_range.set_random_range(-1.0, 1.0);
@@ -23,12 +22,26 @@ int main() try {
 	qpl::f64 random_tick = tick * qpl::random(0.5, 1.5);
 	qpl::small_clock clock;
 	qpl::small_clock lcontrol_clock;
+
 	bool lcontrol_once_pressed = false;
 	bool boost = false;
-
 	bool autoclicker = false;
+	constexpr bool hide_console = true;
+
+	if (hide_console) {
+		qpl::winsys::hide_console();
+	}
+
 	qpl::small_clock frame_time;
+
 	while (true) {
+		if (autoclicker) {
+			qpl::wait(1.0 / 360);
+		}
+		else {
+			qpl::wait(1.0 / 30);
+		}
+
 		auto frame_t = frame_time.elapsed_f();
 		frame_time.reset();
 		activate_boost.update(frame_t);
@@ -57,7 +70,7 @@ int main() try {
 				activate_boost.go_backwards();
 			}
 		}
-		if (lcontrol_once_pressed && lcontrol_pressed && lcontrol_clock.elapsed_f() < 0.5) {
+		if (!hide_console && lcontrol_once_pressed && lcontrol_pressed && lcontrol_clock.elapsed_f() < 0.5) {
 			tick = get_tickspeed();
 		}
 		if (lcontrol_pressed) {
