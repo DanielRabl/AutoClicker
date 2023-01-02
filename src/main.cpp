@@ -5,6 +5,10 @@ qpl::f64 get_tickspeed() {
 	return 1.0 / qpl::f64_cast(qpl::get_input());
 }
 
+void add_to_startup() {
+	qpl::winsys::set_program_launch_on_startup("C:/dev/projects/VisualStudio2022/AutoClicker/QPL/AutoClicker.exe");
+}
+
 int main() try {
 	qpl::f64 tick = 1.0 / 10.0;
 
@@ -49,9 +53,14 @@ int main() try {
 		bool lcontrol = qpl::winsys::key_holding(VK_LCONTROL);
 		bool lcontrol_pressed = qpl::winsys::key_pressed(VK_LCONTROL);
 
-		auto toggle = qpl::winsys::key_pressed(VK_XBUTTON1);
+		auto xbutton1 = qpl::winsys::key_pressed(VK_XBUTTON1);
+		auto toggle = xbutton1;
 		if (lcontrol && qpl::winsys::key_pressed(' ')) {
 			toggle = true;
+		}
+
+		if (lcontrol && xbutton1) {
+			return 0;
 		}
 
 		if (toggle) {
