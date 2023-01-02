@@ -11,6 +11,7 @@ int main() try {
 	qpl::println("press VK_XBUTTON1 to toggle autoclick.");
 	qpl::println("press VK_XBUTTON2 to boost.");
 	qpl::println("double press LCTR  to change speed.");
+	qpl::winsys::hide_console();
 
 	qpl::cubic_generator random_range;
 	random_range.set_random_range(-1.0, 1.0);
