@@ -17,7 +17,7 @@ int main() try {
 	random_range.set_speed(1.5);
 
 	qpl::animation activate_boost;
-	activate_boost.set_duration(1.0);
+	activate_boost.set_duration(2.0);
 
 	qpl::f64 random_tick = tick * qpl::random(0.5, 1.5);
 	qpl::small_clock clock;
@@ -29,6 +29,7 @@ int main() try {
 	qpl::small_clock frame_time;
 	while (true) {
 		auto frame_t = frame_time.elapsed_f();
+		frame_time.reset();
 		activate_boost.update(frame_t);
 
 		bool lcontrol = qpl::winsys::key_holding(VK_LCONTROL);
@@ -63,17 +64,18 @@ int main() try {
 			lcontrol_once_pressed = true;
 		}
 
+		qpl::println(activate_boost.get_curve_progress());
+
 		if (autoclicker) {
 			random_range.update(frame_t);
 			auto exp = std::pow(2, random_range.get());
 			auto delta = tick * exp;
 
-			delta *= qpl::linear_interpolation(1.0, 0.25, activate_boost.get_curve_progress());
+			delta *= qpl::linear_interpolation(1.0, 0.1, activate_boost.get_curve_progress());
 			if (clock.has_elapsed_reset(delta)) {
 				qpl::winsys::click_left_mouse();
 			}
 		}
-		frame_time.reset();
 	}
 
 }
