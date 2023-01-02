@@ -65,10 +65,6 @@ int main() try {
 
 		if (toggle) {
 			autoclicker = !autoclicker;
-			if (!autoclicker) {
-				boost = false;
-				activate_boost.go_backwards();
-			}
 		}
 		if (autoclicker && qpl::winsys::key_pressed(VK_XBUTTON2)) {
 			boost = !boost;
