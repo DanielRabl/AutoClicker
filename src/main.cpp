@@ -64,8 +64,6 @@ int main() try {
 			lcontrol_once_pressed = true;
 		}
 
-		qpl::println(activate_boost.get_curve_progress());
-
 		if (autoclicker) {
 			random_range.update(frame_t);
 			auto exp = std::pow(2, random_range.get());
