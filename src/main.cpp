@@ -1,10 +1,5 @@
 #include <qpl/qpl.hpp>
 
-qpl::f64 get_tickspeed() {
-	qpl::print("how many clicks / second? > ");
-	return 1.0 / qpl::f64_cast(qpl::get_input());
-}
-
 void add_to_startup() {
 	qpl::winsys::set_program_launch_on_startup("C:/dev/projects/VisualStudio2022/AutoClicker/QPL/AutoClicker.exe");
 }
@@ -30,6 +25,8 @@ int main() try {
 	bool lcontrol_once_pressed = false;
 	bool boost = false;
 	bool autoclicker = false;
+	bool disabled = false;
+	bool xbutton2_clicked_once = false;
 	constexpr bool hide_console = true;
 
 	if (hide_console) {
@@ -37,6 +34,7 @@ int main() try {
 	}
 
 	qpl::small_clock frame_time;
+	qpl::small_clock disable_cooldown;
 
 	while (true) {
 		if (autoclicker) {
@@ -54,43 +52,50 @@ int main() try {
 		bool lcontrol_pressed = qpl::winsys::key_pressed(VK_LCONTROL);
 
 		auto xbutton1 = qpl::winsys::key_pressed(VK_XBUTTON1);
-		auto toggle = xbutton1;
-		if (lcontrol && qpl::winsys::key_pressed(' ')) {
-			toggle = true;
-		}
+		auto xbutton2 = qpl::winsys::key_pressed(VK_XBUTTON2);
 
-		if (lcontrol && xbutton1) {
-			return 0;
-		}
-
-		if (toggle) {
-			autoclicker = !autoclicker;
-		}
-		if (autoclicker && qpl::winsys::key_pressed(VK_XBUTTON2)) {
-			boost = !boost;
-			if (boost) {
-				activate_boost.go_forwards();
+		if (xbutton2) {
+			if (xbutton2_clicked_once && disable_cooldown.elapsed_f() < 0.5) {
+				disabled = !disabled;
 			}
-			else {
-				activate_boost.go_backwards();
+			xbutton2_clicked_once = true;
+			disable_cooldown.reset();
+		}
+
+		if (!disabled) {
+			auto toggle = xbutton1;
+
+			if (lcontrol && xbutton1) {
+				return 0;
 			}
-		}
-		if (!hide_console && lcontrol_once_pressed && lcontrol_pressed && lcontrol_clock.elapsed_f() < 0.5) {
-			tick = get_tickspeed();
-		}
-		if (lcontrol_pressed) {
-			lcontrol_clock.reset();
-			lcontrol_once_pressed = true;
-		}
 
-		if (autoclicker) {
-			random_range.update(frame_t);
-			auto exp = std::pow(2, random_range.get());
-			auto delta = tick * exp;
+			if (toggle) {
+				autoclicker = !autoclicker;
+			}
 
-			delta *= qpl::linear_interpolation(1.0, 0.1, activate_boost.get_curve_progress());
-			if (clock.has_elapsed_reset(delta)) {
-				qpl::winsys::click_left_mouse();
+			if (autoclicker && xbutton2) {
+				boost = !boost;
+				if (boost) {
+					activate_boost.go_forwards();
+				}
+				else {
+					activate_boost.go_backwards();
+				}
+			}
+			if (lcontrol_pressed) {
+				lcontrol_clock.reset();
+				lcontrol_once_pressed = true;
+			}
+
+			if (autoclicker) {
+				random_range.update(frame_t);
+				auto exp = std::pow(2, random_range.get());
+				auto delta = tick * exp;
+
+				delta *= qpl::linear_interpolation(1.0, 0.1, activate_boost.get_curve_progress());
+				if (clock.has_elapsed_reset(delta)) {
+					qpl::winsys::click_left_mouse();
+				}
 			}
 		}
 	}
